@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/arthurbrit0/blog-backend/database"
 	"github.com/arthurbrit0/blog-backend/models"
+	"github.com/arthurbrit0/blog-backend/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -67,5 +70,49 @@ func Registrar(context *fiber.Ctx) error {
 	return context.JSON(fiber.Map{
 		"usuario":  usuario,
 		"mensagem": "Conta criada com sucesso!",
+	})
+}
+
+func Login(context *fiber.Ctx) error {
+	var dados map[string]string // variavel para armazenar os dados passados pelo usuario na requisicao
+
+	if err := context.BodyParser(&dados); err != nil { // usando o BodyParser no contexto da requisição para transformar o json em uma struct
+		fmt.Println("Não foi possível dar parse nos dados da requisição.")
+	}
+
+	var dadosUsuario models.Usuario                                     // variavel para armazenar os dados do usuario mandados na requisicao
+	database.DB.Where("email = ?", dados["email"]).First(&dadosUsuario) // checando no banco de dados se existe um email cadastrado
+	if dadosUsuario.Id == 0 {                                           // se não existir, a função retorna um ID 0
+		context.Status(404)
+		return context.JSON(fiber.Map{ // retornamos um erro em formato json para o usuario caso o email não tenha sido encontrado
+			"mensagem": "Email não existe! Crie uma conta",
+		})
+	}
+
+	if err := dadosUsuario.CompararSenha(dados["senha"]); err != nil { // comparando a senha enviada na requisicao com a senha hasheada
+		context.Status(400) // do usuario que achamos no bdd com o email passado na requisicao
+		return context.JSON(fiber.Map{
+			"mensagem": "Senha incorreta",
+		})
+	}
+
+	token, err := utils.GerarJWT(strconv.Itoa(int(dadosUsuario.Id))) // se estiver tudo certo com o usuario e sua senha, geramos um token pra ele com
+	if err != nil {                                                  // a funcao GerarJWT feita no diretorio utils.
+		context.Status(fiber.StatusInternalServerError) // passamos como issuer desse jwt o id do usuario
+		return nil
+	}
+
+	cookie := fiber.Cookie{ // criando um cookie com o token que criamos para o usuario
+		Name:     "jwt",
+		Value:    token,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HTTPOnly: true,
+	}
+
+	context.Cookie(&cookie) // armazenando esse cookie
+
+	return context.JSON(fiber.Map{ // retornando para o usuario, apos todas as verificacoes, a respota de sucesso do login e seus dados
+		"mensagem":      "Usuário logado com sucesso!",
+		"dados_usuario": dadosUsuario,
 	})
 }

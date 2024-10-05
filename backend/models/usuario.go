@@ -12,6 +12,10 @@ type Usuario struct {
 }
 
 func (usuario *Usuario) SetSenha(senha string) {
-	senhaHasheada, _ := bcrypt.GenerateFromPassword([]byte(senha), 14)
-	usuario.Senha = senhaHasheada
+	senhaHasheada, _ := bcrypt.GenerateFromPassword([]byte(senha), 14) // função para hashear a senha
+	usuario.Senha = senhaHasheada                                      // setando a senha que será armazenada no banco de dados como a hasheada
+}
+
+func (usuario *Usuario) CompararSenha(senha string) error {
+	return bcrypt.CompareHashAndPassword(usuario.Senha, []byte(senha)) // comparando a senha hasheada com a senha passada pelo usuario no login
 }
