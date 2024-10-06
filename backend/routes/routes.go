@@ -24,7 +24,8 @@ func SetarRotas(app *fiber.App) {
 	app.Get("/api/meusposts", controllers.GetMeusPosts)
 	app.Delete("/api/post/:id", controllers.DeletarPost)
 
-	// rota de upload de imagem
+	// rotas de imagem
 
 	app.Post("/api/upload", controllers.Upload)
+	app.Static("/api/uploads", "./uploads")
 }
