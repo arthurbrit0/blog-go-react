@@ -21,4 +21,6 @@ func SetarRotas(app *fiber.App) {
 	app.Get("/api/posts", controllers.GetTodosPosts)
 	app.Get("/api/post/:id", controllers.GetDetalhesPost)
 	app.Put("/api/post/:id", controllers.EditarPost)
+	app.Get("/api/meusposts", controllers.GetMeusPosts)
+	app.Delete("/api/post/:id", controllers.DeletarPost)
 }

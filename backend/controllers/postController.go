@@ -1,13 +1,16 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"strconv"
 
 	"github.com/arthurbrit0/blog-backend/database"
 	"github.com/arthurbrit0/blog-backend/models"
+	"github.com/arthurbrit0/blog-backend/utils"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func CriarPost(context *fiber.Ctx) error {
@@ -90,4 +93,53 @@ func EditarPost(context *fiber.Ctx) error {
 	return context.JSON(fiber.Map{
 		"mensagem": "Post atualizado com sucesso!",
 	})
+}
+
+func GetMeusPosts(context *fiber.Ctx) error {
+	cookie := context.Cookies("jwt") // pegando o cookie jwt
+
+	id, err := utils.ParseJWT(cookie) // parseando o jwt para pegar o id do usuario
+	if err != nil {
+		return context.JSON(fiber.Map{
+			"erro": "Não foi possível pegar o id do usuario",
+		})
+	}
+
+	var posts = []models.Post{}                                             // criando variavel para armazenar os posts do usuario autenticado
+	database.DB.Where("usuario_id = ?", id).Preload("Usuario").Find(&posts) // buscando os posts do usuario autenticado
+	return context.JSON(posts)
+
+}
+
+func DeletarPost(context *fiber.Ctx) error {
+	id, err := strconv.Atoi(context.Params("id")) // pegando o id a partir dos parametros da url
+
+	if err != nil {
+		return context.JSON(fiber.Map{ // se não conseguirmos converter o id dos parametros, retornamos um erro
+			"erro": "ID do post inválido",
+		})
+	}
+
+	var post models.Post // criando uma variavel para armazenar os dados do post com o id especifico
+
+	if err := database.DB.First(&post, id).Error; err != nil {
+		context.Status(404)
+		return context.JSON(fiber.Map{
+			"erro": "Post não encontrado",
+		})
+	}
+
+	deleteQuery := database.DB.Delete(&post) // deletando esse post que criamos do banco de dados
+
+	if errors.Is(deleteQuery.Error, gorm.ErrRecordNotFound) {
+		context.Status(404)
+		return context.JSON(fiber.Map{
+			"erro": "Post não encontrado",
+		})
+	}
+
+	return context.JSON(fiber.Map{
+		"mensagem": "Post deletado com sucesso",
+	})
+
 }
