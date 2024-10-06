@@ -11,6 +11,7 @@ import (
 	"github.com/arthurbrit0/blog-backend/database"
 	"github.com/arthurbrit0/blog-backend/models"
 	"github.com/arthurbrit0/blog-backend/utils"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -115,4 +116,9 @@ func Login(context *fiber.Ctx) error {
 		"mensagem":      "Usuário logado com sucesso!",
 		"dados_usuario": dadosUsuario,
 	})
+
+}
+
+type Claims struct {
+	jwt.StandardClaims
 }

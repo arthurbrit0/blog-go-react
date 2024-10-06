@@ -43,5 +43,5 @@ func Connect() {
 	DB = connectDB()                                                     // obtendo o ponteiro para o banco de dados
 	fmt.Println("Conexão com o banco de dados estabelecida com sucesso") // se não houver nenhum erro nas funções chamadas acima, o banco foi conectado com sucesso
 
-	DB.AutoMigrate(&models.Usuario{}) // usando a função AutoMigrate do gorm para migrar o modelo de Usuario para uma tabela do banco de dados mysql
+	DB.AutoMigrate(&models.Usuario{}, &models.Post{}) // usando a função AutoMigrate do gorm para migrar o modelo de Usuario para uma tabela do banco de dados mysql
 }

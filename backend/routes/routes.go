@@ -9,5 +9,8 @@ import (
 func SetarRotas(app *fiber.App) {
 	app.Post("/api/registrar", controllers.Registrar)
 	app.Post("/api/login", controllers.Login)
-	app.Use(middleware.IsUsuarioAutenticado)
+
+	app.Use(middleware.IsUsuarioAutenticado) // protegendo as rotas que precisam de autenticacao
+
+	app.Post("/api/post", controllers.CriarPost)
 }
