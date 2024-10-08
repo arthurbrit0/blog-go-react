@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import './index.css';
 import Registrar from './pages/Registrar';
 import Navbar from './components/Navbar';
+import MeusPosts from './pages/MeusPosts';
 
 function App() {
 
@@ -14,7 +15,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="pt-5">
+        <div className="pt-5 w-2/3 mx-auto">
         <Navbar />
           <div className="container mx-auto heig mt-8 p-8 bg-white shadow-lg rounded-lg border border-gray-200">
           <Routes>
@@ -25,6 +26,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/meusposts"
+              element={
+                <ProtectedRoute>
+                  <MeusPosts />
                 </ProtectedRoute>
               }
             />

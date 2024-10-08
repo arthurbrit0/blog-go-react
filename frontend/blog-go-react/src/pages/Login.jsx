@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function Login() {
   const [email, setEmail] = useState(''); // criando states de email e senha para armazenar os valores dos inputs
   const [senha, setPassword] = useState('');
 
   const navigate = useNavigate(); // hook para navegar entre as rotas
+  const { checkAuth } = useAuth(); // hook para verificar se o usuario esta autenticado
 
   const login = async (email, senha) => {
     try {
@@ -19,11 +21,15 @@ function Login() {
         body: JSON.stringify({ email, senha }),
       });
       const data = await response.json();
+      if (response.ok) {
+        console.log(data); 
+        checkAuth(); // checando o contexto de autenticacao para atualizar o estado do usuario autenticado
+        navigate('/')
+      }
       console.log(data);
     } catch (error) {
         console.error(error);
     }
-    navigate('/') // apos a verificacao de erros, o usuario sera redirecionado para a home
     
   }
 

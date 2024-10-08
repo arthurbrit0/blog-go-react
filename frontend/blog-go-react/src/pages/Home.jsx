@@ -1,17 +1,43 @@
+import { useState, useEffect } from "react";
+
 function Home() {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <h1 className="text-3xl font-bold mb-4">Último Posts</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-4 shadow-md rounded">
-            <h2 className="text-xl font-semibold">Título do Post</h2>
-            <p className="text-gray-700">Descrição do post</p>
-            <a href="#" className="text-blue-500 hover:underline">Leia mais</a>
+  const [posts, setPosts] = useState([]);
+
+  const getPosts = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/posts', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const result = await response.json();
+      setPosts(result.data); 
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getPosts();
+  }, []);
+
+  return (
+    <div>
+      {posts.length > 0 ? (
+        posts.map((post) => (
+          <div key={post.id} className="mb-4 p-4 bg-white shadow-md rounded-lg">
+            <h2 className="text-xl font-bold">{post.titulo}</h2>
+            <p className="text-gray-700">{post.descricao}</p>
+            <img src={post.imagem} alt={post.titulo} className="w-full h-64 object-cover mt-2" />
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold">Autor: {post.usuario.primeiro_nome} {post.usuario.ultimo_nome}</h3>
+            </div>
           </div>
-        </div>
-      </div>
-    );
-  }
-  
-  export default Home;
-  
+        ))
+      ) : (
+        <p>Carregando posts...</p>
+      )}
+    </div>
+  );
+}
+
+export default Home;
