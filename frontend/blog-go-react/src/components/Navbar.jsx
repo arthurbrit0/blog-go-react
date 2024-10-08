@@ -6,21 +6,21 @@ function Navbar() {
 
   const navigate = useNavigate();
 
-  const { auth, checkAuth } = useAuth();
+  const { auth, checkAuth } = useAuth(); // usando o hook que criamos para checkar se o usuario esta autenticado
 
-  const handleLogout = async () => {
+  const handleLogout = async () => { // função para fazer logout
     try {
-      const response = await fetch('http://localhost:3000/api/logout', {
+      const response = await fetch('http://localhost:3000/api/logout', { // fazemos um post na rota de logout
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', // a rota de logout pega o cookie que tem o jwt enviado pelo usuario e o deleta
         },
         credentials: 'include',
       });
 
       if (response.ok) {
         console.log('Logout efetuado com sucesso');
-        checkAuth();
+        checkAuth(); // checamos se o usuario tem acesso ao endpoint /api/me. se não tiver, auth sera null
         navigate('/');  
         
       }
@@ -37,13 +37,13 @@ function Navbar() {
         <Link to="/meusposts" className="hover:scale-110 transition-all items-center">Meus Posts</Link>
       </div>
       <div className="flex">
-        {auth ? ( // Se o usuário estiver autenticado, mostrar o botão de logout
+        {auth ? ( // se o usuário estiver autenticado, mostrar o botão de logout
           <button
             onClick={handleLogout}
             className="bg-red-600 p-2 rounded-md text-white hover:scale-110 transition-all">
             Logout
           </button>
-        ) : ( // Se o usuário não estiver autenticado, mostrar os botões de login e registrar
+        ) : ( // se o usuário não estiver autenticado, mostrar os botões de login e registrar
           <>
             <div className="hover:scale-110 transition-all items-center">
               <Link to="/login" className="mr-4">Login</Link>
