@@ -153,17 +153,17 @@ type Claims struct {
 }
 
 func GetMe(context *fiber.Ctx) error {
-	cookie := context.Cookies("jwt") // pegando o cookie jwt
+	cookie := context.Cookies("jwt")
 
-	id, err := utils.ParseJWT(cookie) // parseando o jwt para pegar o id do usuario
+	id, err := utils.ParseJWT(cookie)
 	if err != nil {
-		return context.JSON(fiber.Map{
-			"erro": "Não foi possível pegar o id do usuario",
+		return context.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"erro": "Não foi possível pegar o id do usuário",
 		})
 	}
 
-	var usuario models.Usuario                      // criando variavel para armazenar os dados do usuario autenticado
-	database.DB.Where("id = ?", id).First(&usuario) // buscando o usuario no banco de dados
+	var usuario models.Usuario
+	database.DB.Where("id = ?", id).First(&usuario)
 
-	return context.JSON(usuario) // retornando os dados do usuario
+	return context.JSON(usuario)
 }

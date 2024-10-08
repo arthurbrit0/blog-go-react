@@ -1,15 +1,17 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext(); // criamos o contexto da autenticação para a aplicação toda
+const AuthContext = createContext(); // Create the context
 
-export const useAuth = () => { // exportamos essa função, que é um hook personalizado para acessar o contexto de autenticação
+export const useAuth = () => {
   return useContext(AuthContext);
 };
 
-export const AuthProvider = ({ children }) => { // criamos o provedor de autenticação, que é um componente que envolve toda a aplicação
-  const [auth, setAuth] = useState(null);    
+export const AuthProvider = ({ children }) => {
+  const [auth, setAuth] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
 
   const checkAuth = async () => {
+    setLoading(true);
     try {
       const response = await fetch('http://localhost:3000/api/me', {
         method: 'GET',
@@ -20,10 +22,12 @@ export const AuthProvider = ({ children }) => { // criamos o provedor de autenti
         const userData = await response.json();
         setAuth(userData);
       } else {
-        setAuth(null); 
+        setAuth(null);
       }
     } catch (error) {
       setAuth(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -32,7 +36,7 @@ export const AuthProvider = ({ children }) => { // criamos o provedor de autenti
   }, []);
 
   return (
-    <AuthContext.Provider value={{ auth, checkAuth }}>
+    <AuthContext.Provider value={{ auth, checkAuth, loading }}>
       {children}
     </AuthContext.Provider>
   );

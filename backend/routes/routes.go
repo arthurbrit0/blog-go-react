@@ -10,8 +10,9 @@ import (
 func SetarRotas(app *fiber.App) {
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5173", // permitindo apenas requisições do localhost:5173
-		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+		AllowOrigins:     "http://localhost:5173", // permitindo apenas requisições do localhost:5173
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
+		AllowCredentials: true,
 	}))
 
 	// rotas de autenticação

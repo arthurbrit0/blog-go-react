@@ -20,7 +20,21 @@ func main() {
 
 	port := os.Getenv("PORT")
 
-	app := fiber.New() // inicializando o app fiber
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+			ctx.Set("Access-Control-Allow-Origin", "http://localhost:5173")
+			ctx.Set("Access-Control-Allow-Credentials", "true")
+
+			code := fiber.StatusInternalServerError
+			if e, ok := err.(*fiber.Error); ok {
+				code = e.Code
+			}
+
+			return ctx.Status(code).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		},
+	}) // inicializando o app fiber
 
 	routes.SetarRotas(app) // setando as rotas da aplicacao
 
