@@ -2,19 +2,37 @@ import { useState, useEffect } from "react";
 
 function Home() {
   const [posts, setPosts] = useState([]);
+  const [paginaAtual, setPaginaAtual] = useState(1); 
+  const [ultimaPagina, setUltimaPagina] = useState(1); 
+  const [totalPosts, setTotalPosts] = useState(0);
 
-  const getPosts = async () => {
+  const getPosts = async (pagina = 1) => {
     try {
-      const response = await fetch('http://localhost:3000/api/posts', {
+      const response = await fetch(`http://localhost:3000/api/posts?pagina=${pagina}`, {
         method: 'GET',
         credentials: 'include',
       });
       const result = await response.json();
       setPosts(result.data); 
+      setPaginaAtual(pagina);
+      setUltimaPagina(result.meta.ultima_pagina); 
+      setTotalPosts(result.meta.total);
     } catch (error) {
       console.log(error);
     }
   };
+
+    const paginaAnterior = () => {
+      if (paginaAtual > 1) {
+        getPosts(paginaAtual - 1);
+      }
+    };
+  
+    const proximaPagina = () => {
+      if (paginaAtual < ultimaPagina) {
+        getPosts(paginaAtual + 1);
+      }
+    };
 
   useEffect(() => {
     getPosts();
@@ -35,6 +53,26 @@ function Home() {
         ))
       ) : (
         <p>Carregando posts...</p>
+      )}
+
+      {ultimaPagina > 1 && (
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={paginaAnterior}
+            disabled={paginaAtual === 1}
+            className="bg-gray-200 p-2 rounded-lg"
+          >
+            Anterior
+          </button>
+          <span>{`Página ${paginaAtual} de ${ultimaPagina}`}</span>
+          <button
+            onClick={proximaPagina}
+            disabled={paginaAtual === ultimaPagina}
+            className="bg-gray-200 p-2 rounded-lg"
+          >
+            Próxima
+          </button>
+        </div>
       )}
     </div>
   );

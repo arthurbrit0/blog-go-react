@@ -7,6 +7,7 @@ import './index.css';
 import Registrar from './pages/Registrar';
 import Navbar from './components/Navbar';
 import MeusPosts from './pages/MeusPosts';
+import CriarPost from './pages/CriarPost';
 
 function App() {
 
@@ -34,6 +35,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <MeusPosts />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/criarpost"
+              element={
+                <ProtectedRoute>
+                  <CriarPost />
                 </ProtectedRoute>
               }
             />

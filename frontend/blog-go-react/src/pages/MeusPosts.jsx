@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom";
 
 const MeusPosts = () => {
 
@@ -9,6 +10,10 @@ const MeusPosts = () => {
     */
 
   const [meusPosts, setMeusPosts] = useState([]); // state para armazenar os posts do usuario logado
+
+  useEffect(() => {
+    getMeusPosts(); // quando o componente MeusPosts for montado, faremos a chamada a api
+  }, []);
 
   const getMeusPosts = async () => {
     try {

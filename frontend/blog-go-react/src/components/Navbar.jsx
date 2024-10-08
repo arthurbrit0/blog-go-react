@@ -33,8 +33,9 @@ function Navbar() {
     <nav className="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg rounded-lg w-9/10 mx-auto py-2">
     <div className="container mx-auto px-4 py-2 flex justify-between items-center text-white">
       <Link to="/" className="text-2xl font-bold hover:scale-105 transition-all">Blog Golang</Link>
-      <div className="mx-auto">
+      <div className="mx-auto justify-between space-x-4 md:space-x-8 lg:space-x-12">
         <Link to="/meusposts" className="hover:scale-110 transition-all items-center">Meus Posts</Link>
+        <Link to="/criarpost" className="hover:scale-110 transition-all items-center">Criar post</Link>
       </div>
       <div className="flex">
         {auth ? ( // se o usuário estiver autenticado, mostrar o botão de logout

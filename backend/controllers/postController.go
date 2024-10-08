@@ -18,7 +18,29 @@ func CriarPost(context *fiber.Ctx) error {
 
 	if err := context.BodyParser(&postBlog); err != nil { // dando parse no corpo da requiiscao para o postBlog
 		fmt.Println("Não foi possível dar parse no corpo da requisição")
+		context.Status(400)
+		return context.JSON(fiber.Map{
+			"mensagem": "Payload inválido",
+		})
 	}
+
+	usuarioID, err := utils.ParseJWT(context.Cookies("jwt")) // pegando o id do usuario autenticado a partir do cookie jwt
+	if err != nil {
+		context.Status(400)
+		return context.JSON(fiber.Map{
+			"mensagem": "Não foi possível pegar o id do usuario",
+		})
+	}
+
+	usuarioIDInt, err := strconv.Atoi(usuarioID) // captura tanto o valor quanto o erro
+	if err != nil {
+		context.Status(400)
+		return context.JSON(fiber.Map{
+			"mensagem": "ID do usuário inválido",
+		})
+	}
+
+	postBlog.UsuarioId = uint(usuarioIDInt) // passando o id do usuario autenticado para o campo UsuarioId do postBlog
 
 	if err := database.DB.Create(&postBlog).Error; err != nil { // criando postBlog no banco de dados
 		context.Status(400)
@@ -40,8 +62,8 @@ func GetTodosPosts(context *fiber.Ctx) error { // função para pegar todo os po
 	var total int64            // variável para armazenar o total de posts no banco de dados
 	var postBlog []models.Post // variavel para armazenar os posts
 
-	database.DB.Preload("Usuario").Offset(offset).Limit(limite).Find(&postBlog) // populando o campo usuario de cada post, com offset e limite
-	database.DB.Model(&models.Post{}).Count(&total)                             // contando o total de posts no banco de dados
+	database.DB.Preload("Usuario").Order("created_at DESC").Offset(offset).Limit(limite).Find(&postBlog) // populando o campo usuario de cada post, com offset e limite
+	database.DB.Model(&models.Post{}).Count(&total)                                                      // contando o total de posts no banco de dados
 
 	return context.JSON(fiber.Map{
 		"data": postBlog, // retornamos os posts do blog, já populados com as informacoes de cada autor
@@ -105,8 +127,8 @@ func GetMeusPosts(context *fiber.Ctx) error {
 		})
 	}
 
-	var posts = []models.Post{}                                             // criando variavel para armazenar os posts do usuario autenticado
-	database.DB.Where("usuario_id = ?", id).Preload("Usuario").Find(&posts) // buscando os posts do usuario autenticado
+	var posts = []models.Post{}                                                                      // criando variavel para armazenar os posts do usuario autenticado
+	database.DB.Where("usuario_id = ?", id).Order("created_at DESC").Preload("Usuario").Find(&posts) // buscando os posts do usuario autenticado
 	return context.JSON(posts)
 
 }

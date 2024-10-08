@@ -55,7 +55,7 @@ function Login() {
         <div className="mb-4">
           <label className="block text-gray-700">Senha</label>
           <input 
-            type="senha" 
+            type="password" 
             className="w-full mt-1 p-2 border rounded" 
             value={senha} 
             onChange={(e) => setPassword(e.target.value)} 
