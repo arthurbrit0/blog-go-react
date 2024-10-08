@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function Registrar() {
-  const [primeiro_nome, setFirstName] = useState('');
+  const [primeiro_nome, setFirstName] = useState(''); // criando states para armazenar os valores dos inputs
   const [ultimo_nome, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setPassword] = useState('');
@@ -11,7 +12,7 @@ function Registrar() {
 
   const registrar = async (primeiro_nome, ultimo_nome, email, senha) => {
     try {
-      const response = await fetch('http://localhost:3000/api/registrar', {
+      const response = await fetch('http://localhost:3000/api/registrar', { // fazendo um post para a api com os dados informados pelo usuario
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -27,7 +28,7 @@ function Registrar() {
       
       const data = await response.json();
       console.log(data); 
-      navigate('/login')
+      navigate('/login') // se o registro for bem sucedido, o usuario sera redirecionado para a pagina de login
     } catch (error) {
       console.error('Erro ao registrar:', error);
     }
@@ -35,7 +36,7 @@ function Registrar() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    registrar(primeiro_nome, ultimo_nome, email, senha);
+    registrar(primeiro_nome, ultimo_nome, email, senha); // handleSubmit sera chamado quando o formulario for submitado, registrando o usuario no banco de dados
   };
 
   return (
@@ -48,7 +49,7 @@ function Registrar() {
             type="text" 
             className="w-full mt-1 p-2 border rounded" 
             value={primeiro_nome} 
-            onChange={(e) => setFirstName(e.target.value)} 
+            onChange={(e) => setFirstName(e.target.value)}  // setando o valor do primeiro nome como o valor do input
             required 
           />
         </div>
@@ -58,7 +59,7 @@ function Registrar() {
             type="text" 
             className="w-full mt-1 p-2 border rounded" 
             value={ultimo_nome} 
-            onChange={(e) => setLastName(e.target.value)} 
+            onChange={(e) => setLastName(e.target.value)} // setando o valor do ultimo nome como o valor do input
             required 
           />
         </div>
@@ -68,7 +69,7 @@ function Registrar() {
             type="email" 
             className="w-full mt-1 p-2 border rounded" 
             value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
+            onChange={(e) => setEmail(e.target.value)} // setando o valor do email como o valor do input
             required 
           />
         </div>
@@ -78,12 +79,13 @@ function Registrar() {
             type="password" 
             className="w-full mt-1 p-2 border rounded" 
             value={senha} 
-            onChange={(e) => setPassword(e.target.value)} 
+            onChange={(e) => setPassword(e.target.value)} // setando o valor da senha como o valor do input
             required 
           />
         </div>
         <button type="submit" className="w-full bg-green-500 text-white p-2 rounded">Registrar</button>
       </form>
+      <Link to="/login" className="block text-center mt-4">Já tem uma conta? Faça login!</Link>
     </div>
   );
 }

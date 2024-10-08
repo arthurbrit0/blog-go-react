@@ -1,20 +1,20 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext(); // Create the context
+const AuthContext = createContext(); // criando o contexto da autenticação para a aplicação toda
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  return useContext(AuthContext); // criando um hook para acessar o contexto da autenticação
 };
 
 export const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState(null);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [auth, setAuth] = useState(null); // criando o state que verifica se o usuario esta autenticado
+  const [loading, setLoading] = useState(true); 
 
   const checkAuth = async () => {
-    setLoading(true);
+    setLoading(true); // setando o loading como true para mostrar que a aplicação esta carregando
     try {
-      const response = await fetch('http://localhost:3000/api/me', {
-        method: 'GET',
+      const response = await fetch('http://localhost:3000/api/me', { // fazendo um get na rota /me para verificar se o usuario esta autenticado
+        method: 'GET',                                              // a api so retorna as informacoes do usuario se ele estiver autenticado
         credentials: 'include',
       });
 

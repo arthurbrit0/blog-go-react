@@ -1,20 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function Login() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(''); // criando states de email e senha para armazenar os valores dos inputs
   const [senha, setPassword] = useState('');
 
-  const navigate = useNavigate();   
+  const navigate = useNavigate(); // hook para navegar entre as rotas
 
   const login = async (email, senha) => {
     try {
-      const response = await fetch('http://localhost:3000/api/login', {
+      const response = await fetch('http://localhost:3000/api/login', { // fazendo um post na rota de login com os dados dos inputs de email e senha
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
+        credentials: 'include', // informndo que a aplicação vai usar cookies
         body: JSON.stringify({ email, senha }),
       });
       const data = await response.json();
@@ -22,13 +23,13 @@ function Login() {
     } catch (error) {
         console.error(error);
     }
-    navigate('/')
+    navigate('/') // apos a verificacao de erros, o usuario sera redirecionado para a home
     
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    login(email, senha);
+    login(email, senha); // handleSubmit chama a função login passando os valores dos inputs após o submit do formulario de login
   };
 
   return (
@@ -41,7 +42,7 @@ function Login() {
             type="email" 
             className="w-full mt-1 p-2 border rounded" 
             value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
+            onChange={(e) => setEmail(e.target.value)} // setando o valor do email como o valor do input
             required 
           />
         </div>
@@ -57,6 +58,7 @@ function Login() {
         </div>
         <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">Login</button>
       </form>
+      <Link to="/registrar" className="block text-center mt-4">Ainda não tem uma conta? Registre-se!</Link>
     </div>
   );
 }
