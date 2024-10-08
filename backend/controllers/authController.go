@@ -23,52 +23,81 @@ func validarEmail(email string) bool {
 func Registrar(context *fiber.Ctx) error {
 	var dados map[string]interface{} // variavel para armazenar os dados passados pelo usuario na requisicao
 
-	var dadosUsuario models.Usuario
-
-	if err := context.BodyParser(&dados); err != nil { // usando o BodyParser no contexto da requisição para transformar o json em uma struct
+	if err := context.BodyParser(&dados); err != nil { // dando parse do corpo na requisicao no map dados
 		fmt.Println("Não foi possível dar parse nos dados da requisição.")
-	}
-
-	if len(dados["senha"].(string)) <= 6 { // validando se a senha tem menos de 6 caracteres
-		context.Status(400)
-		return context.JSON(fiber.Map{
-			"mensagem": "A senha tem que ter mais de 6 caracteres!",
+		return context.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"mensagem": "Dados inválidos!",
 		})
 	}
 
-	if !validarEmail(strings.TrimSpace(dados["email"].(string))) { // validando se o email é valido
-		context.Status(400)
-		return context.JSON(fiber.Map{
+	senha, senhaOk := dados["senha"].(string) // validando se a senha existe e é uma string
+	if !senhaOk || senha == "" {
+		return context.Status(400).JSON(fiber.Map{
+			"mensagem": "A senha é obrigatória e deve ser uma string.",
+		})
+	}
+
+	if len(senha) < 6 { // validando se a senha tem mais de 6 caracteres
+		return context.Status(400).JSON(fiber.Map{
+			"mensagem": "A senha deve ter mais de 6 caracteres.",
+		})
+	}
+
+	email, emailOk := dados["email"].(string) // validando se o email existe e é uma string
+	if !emailOk || email == "" {
+		return context.Status(400).JSON(fiber.Map{
+			"mensagem": "O email é obrigatório e deve ser uma string.",
+		})
+	}
+
+	if !validarEmail(strings.TrimSpace(email)) { // usando a funcao com regex para validar o email passado na requisicao
+		return context.Status(400).JSON(fiber.Map{
 			"mensagem": "O email é inválido!",
 		})
 	}
 
-	// passando o usuario cadastrado no banco de dados que tem o mesmo email do que foi enviado no corpo da requisicao
-	database.DB.Where("email=?", strings.TrimSpace(dados["email"].(string))).First(&dadosUsuario)
+	primeiroNome, primeiroNomeOk := dados["primeiro_nome"].(string) // verificando se o primeiro nome existe e é uma string
+	if !primeiroNomeOk || strings.TrimSpace(primeiroNome) == "" {
+		return context.Status(400).JSON(fiber.Map{
+			"mensagem": "Primeiro nome é obrigatório.",
+		})
+	}
 
-	if dadosUsuario.Id != 0 { // se não houver esse usuario, o id será 0, mas se houver, retornaremos um erro
-		context.Status(400)
-		return context.JSON(fiber.Map{
+	ultimoNome, ultimoNomeOk := dados["ultimo_nome"].(string) // verificando se o ultimo nome existe e é uma string
+	if !ultimoNomeOk || strings.TrimSpace(ultimoNome) == "" {
+		return context.Status(400).JSON(fiber.Map{
+			"mensagem": "Último nome é obrigatório.",
+		})
+	}
+
+	telefone, telefoneOk := dados["telefone"].(string) // verificando se o telefone existe e é uma string
+	if !telefoneOk {
+		telefone = ""
+	}
+
+	var dadosUsuario models.Usuario // criando variavel para armazenar os dados do usuario
+	if err := database.DB.Where("email = ?", strings.TrimSpace(email)).First(&dadosUsuario).Error; err == nil {
+		return context.Status(400).JSON(fiber.Map{ // achando no banco de dados para ver se ja tem um usuario com esse email registrado
 			"mensagem": "O e-mail já está cadastrado!",
 		})
 	}
 
-	usuario := models.Usuario{ // passando os dados do corpo da requisicao para o model usuario
-		PrimeiroNome: dados["primeiro_nome"].(string),
-		UltimoNome:   dados["ultimo_nome"].(string),
-		Email:        strings.TrimSpace(dados["email"].(string)),
-		Telefone:     dados["telefone"].(string),
+	usuario := models.Usuario{ // criando um novo usuario com os dados passados na requisicao
+		PrimeiroNome: primeiroNome,
+		UltimoNome:   ultimoNome,
+		Email:        strings.TrimSpace(email),
+		Telefone:     telefone,
 	}
 
-	usuario.SetSenha(dados["senha"].(string))
-	err := database.DB.Create(&usuario)
-	if err != nil {
-		log.Println(err)
+	usuario.SetSenha(senha)                                    // usando o metodo do usuario para setar uma senha hasheada a partir da senha enviada na requisicao
+	if err := database.DB.Create(&usuario).Error; err != nil { // criando o usuario no banco de dados
+		log.Println("Erro ao criar usuário:", err)
+		return context.Status(500).JSON(fiber.Map{
+			"mensagem": "Erro ao criar usuário",
+		})
 	}
 
-	context.Status(201)
-
-	return context.JSON(fiber.Map{
+	return context.Status(201).JSON(fiber.Map{ // passando em todas as verificacoes, os dados do usuario sao retornados na resposta
 		"usuario":  usuario,
 		"mensagem": "Conta criada com sucesso!",
 	})
