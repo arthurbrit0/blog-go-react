@@ -23,6 +23,8 @@ func SetarRotas(app *fiber.App) {
 
 	app.Use(middleware.IsUsuarioAutenticado) // protegendo as rotas que precisam de autenticacao
 
+	app.Post("/api/logout", controllers.Logout)
+
 	// rotas de posts
 
 	app.Post("/api/post", controllers.CriarPost)

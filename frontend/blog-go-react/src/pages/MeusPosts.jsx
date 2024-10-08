@@ -2,6 +2,12 @@ import { useState, useEffect } from "react"
 
 const MeusPosts = () => {
 
+    /* 
+    
+    TODO: Fazer update e delete de posts
+    
+    */
+
   const [meusPosts, setMeusPosts] = useState([]); // state para armazenar os posts do usuario logado
 
   const getMeusPosts = async () => {

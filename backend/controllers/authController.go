@@ -167,3 +167,18 @@ func GetMe(context *fiber.Ctx) error {
 
 	return context.JSON(usuario)
 }
+
+func Logout(context *fiber.Ctx) error {
+	cookie := fiber.Cookie{ // pegamos o cookie que contem o token jwt
+		Name:     "jwt",
+		Value:    "",                         // definimos seu valor como nulo
+		Expires:  time.Now().Add(-time.Hour), // definimos sua data de expiração no passado, para que ele expire instantaneamente
+		HTTPOnly: true,
+	}
+
+	context.Cookie(&cookie) // setamos esse cookie jwt no contexto da requisicao
+
+	return context.Status(fiber.StatusOK).JSON(fiber.Map{
+		"mensagem": "Logout realizado com sucesso",
+	})
+}
