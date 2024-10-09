@@ -18,9 +18,9 @@ export const AuthProvider = ({ children }) => {
         credentials: 'include',
       });
 
-      if (response.ok) {
+      if (response.ok) { // se a resposta der ok, quer dizer que o usuario está autenticado
         const userData = await response.json();
-        setAuth(userData);
+        setAuth(userData); // autenticando o usuario e setando o state de auth como as informações do usuario
       } else {
         setAuth(null);
       }
@@ -32,11 +32,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    checkAuth();
+    checkAuth(); // toda vez que o componente for montado, a função checkAuth será chamada
   }, []);
 
   return (
-    <AuthContext.Provider value={{ auth, checkAuth, loading }}>
+    <AuthContext.Provider value={{ auth, checkAuth, loading }}> {/* passando o state de auth, a função checkAuth e o state de loading para o contexto */}
       {children}
     </AuthContext.Provider>
   );
