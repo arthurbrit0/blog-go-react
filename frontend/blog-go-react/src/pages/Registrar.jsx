@@ -8,7 +8,7 @@ function Registrar() {
   const [email, setEmail] = useState('');
   const [senha, setPassword] = useState('');
 
-  const navigate = useNavigate();   
+  const navigate = useNavigate();   // usando o useNavigate para redirecionar o usuario apos o registro para a pagina de login
 
   const registrar = async (primeiro_nome, ultimo_nome, email, senha) => {
     try {
@@ -17,10 +17,10 @@ function Registrar() {
         headers: {
           "Content-Type": "application/json",
         }, 
-        body: JSON.stringify({ primeiro_nome, ultimo_nome, email, senha }),
+        body: JSON.stringify({ primeiro_nome, ultimo_nome, email, senha }), // passando os states, que serão os valores armazenados dos inputs, para o corpo da requisição
       });
 
-      if (!response.ok) {
+      if (!response.ok) { // verificando se a resposta da api é ok
         const errorData = await response.json();
         throw new Error(errorData.mensagem || 'Erro ao registrar');
       }
@@ -42,7 +42,7 @@ function Registrar() {
   return (
     <div className="container mx-auto px-4 py-6 max-w-md">
       <h1 className="text-2xl font-bold mb-4">Registrar</h1>
-      <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded">
+      <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded"> {/* AO SUBMITAR O FORMULARIO, A FUNCAO HANDLESUBMIT SERA CHAMADA, REGISTRANDO O USUARIO NO BANCO */}
         <div className="mb-4">
           <label className="block text-gray-700">Primeiro Nome</label>
           <input 
